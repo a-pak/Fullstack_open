@@ -1,4 +1,4 @@
 # Fullstack_open
-Fullstack_open course submissions
+Full stack open course submissions
 
-Tästä reposta löytyy Helsingin yliopiston Fullstack_open kurssin tehtävien vastaukset. 
+Tästä reposta löytyy Helsingin yliopiston Full stack open kurssin tehtävien vastaukset. 
