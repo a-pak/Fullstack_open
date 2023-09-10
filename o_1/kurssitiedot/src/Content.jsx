@@ -4,12 +4,12 @@ import Parts from './Parts'
 
 
 const Content = (props) => {
-  console.log(props.parts)
+  console.log('from Contents.jsx::', props.parts)
   return (
     <div>
-        <Parts part={props.parts[0][0]} exercise={props.parts[0][1]} />
-        <Parts part={props.parts[1][0]} exercise={props.parts[1][1]} />
-        <Parts part={props.parts[2][0]} exercise={props.parts[2][1]} />
+        <Parts part={props.parts[0].name} exercise={props.parts[0].exercises} />
+        <Parts part={props.parts[1].name} exercise={props.parts[1].exercises} />
+        <Parts part={props.parts[2].name} exercise={props.parts[2].exercises} />
     </div>
   )
 }
