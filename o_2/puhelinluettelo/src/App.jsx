@@ -1,4 +1,4 @@
-import { useState, effectHook, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Persons from './Components/Persons'
 import AddPerson from './Components/AddPerson'
 import Filter from './Components/Filter'
@@ -11,7 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [reRender, setReRender] = useState('')
+  const [reRender, setReRender] = useState(false)
   const [notifMsg, setNotifMsg] = useState('')
 
   useEffect(() => {
@@ -20,6 +20,7 @@ const App = () => {
       .then(response => {
         setPersons(response.data)
       })
+    
   }, [reRender])
 
   const hasArray = (ar, key, value) => {
@@ -40,7 +41,6 @@ const App = () => {
     setFilter(event.target.value)
   }
   const remove = (person) => {
-    console.log('removesta', person)
     if (confirm(`Do you want to permanently delete ${person.name} from phonebook?`)) {
       pbService
         .remove(person.id)
@@ -50,7 +50,7 @@ const App = () => {
         .catch(error => {
         console.error('Error removing person:', error)
         });
-      setReRender('removed', person.id)
+      setReRender(!reRender)
       setNotifMsg(
         `Person '${person.name}' removed succesfully`
       )
@@ -64,8 +64,7 @@ const App = () => {
     event.preventDefault()
     const person = {
       name: newName,
-      number: newNumber,
-      id: (persons.length+1)
+      number: newNumber
     }
     if(!hasArray(persons, 'name', person.name )) {
 
@@ -76,11 +75,17 @@ const App = () => {
         .create(person)
         .then(response => {
           console.log(response)
+          setNotifMsg(
+            `Persons '${person.name}' added to phonebook`
+          )
         })
-      setReRender('updated persons')
-      setNotifMsg(
-        `Persons '${person.name}' added to phonebook`
-      )
+        .catch(error => {
+          console.log(error.response.data)
+          setNotifMsg(error.response.data.error)
+        })
+      setReRender(!reRender)
+
+
       setTimeout(() => {
         setNotifMsg(null)
       }, 5000)
@@ -88,17 +93,20 @@ const App = () => {
     } else if(hasArray(persons, 'name', person.name ) && !hasArray(persons, 'number', person.number )) {
 
         const existingPerson = persons.find(p => p.name === person.name)
+        console.log('id', existingPerson.id)
         if (confirm(`Do you want to update persons ${person.name} number?`)){
 
           pbService
             .update(existingPerson.id, person)
             .then(response => {
-              setPersons([...persons, response.data])
+              setPersons(persons.map(p => p.id !== person.id ? p : response))
             })
-          setReRender('updated', existingPerson.id)
+          setReRender(!reRender)
           setNotifMsg(
-            `Persons '${person.name}' number (sometimes) succesfully updated`
+            `Persons '${person.name}' number succesfully updated`
           )
+          setNewName('')
+          setNewNumber('')
           setTimeout(() => {
             setNotifMsg(null)
           }, 5000)
