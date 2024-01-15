@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+require('express-async-errors')
 
 const api = supertest(app)
 
@@ -34,7 +35,7 @@ test('POST /api/blogs posts a blog to the db', async() => {
     "author": "test",
     "url": "some.url"
   }
-  
+  console.log(newBlog)
   await api
     .post('/api/blogs')
     .send(newBlog)
@@ -49,13 +50,42 @@ test('POST /api/blogs posts a blog to the db', async() => {
 })
 
 test('Delete "Test_Blog" from db', async() => {
-  console.log(blogToBeRemoved.id)
   await api
     .delete(`/api/blogs/${blogToBeRemoved.id}`)
     .expect(204)
 
   const response = await api.get('/api/blogs')
   expect(response.body).not.toContain(blogToBeRemoved) 
+})
+
+test('Wrong post request returns "400 Bad Request"', async() => {
+  const blog = {
+    "title": "Wrong blog",
+    "author": "admin"
+  }
+  await api
+    .post('/api/blogs/')
+    .send(blog)
+    .expect(400)
+})
+
+test('Editing a premade blog edits the blog and returns 200', async() => {
+  const editedBlog = {
+    "id": "65490b02f39fa5c7781f6308",
+    "title": "some title3",
+    "author": "me2",
+    "url": "some.url",
+    "likes": 2
+  }
+  console.log(editedBlog.id)
+  
+  const response = await api
+    .put(`/api/blogs/${editedBlog.id}`)
+    .send(editedBlog)
+    .expect(200)
+    .expect("Content-Type", /application\/json/)
+
+  expect(response.body).toEqual(editedBlog)
 })
 
 afterAll(async () => {
