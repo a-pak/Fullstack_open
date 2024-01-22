@@ -10,7 +10,7 @@ require('express-async-errors')
 const api = supertest(app)
 
 describe('when there is initially one user at db', () => {
-  /*beforeEach(async () => {
+  beforeEach(async () => {
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('sekret', 10)
@@ -18,7 +18,7 @@ describe('when there is initially one user at db', () => {
 
     await user.save()
   })
-  */
+  
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
 

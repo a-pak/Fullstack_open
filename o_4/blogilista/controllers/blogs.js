@@ -2,27 +2,28 @@ const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
 require('express-async-errors')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
-blogRouter.get('/api/blogs/', async (request, response) => {
+
+blogRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
     .populate('user', {username: 1, name: 1})
-
   response.json(blogs)
 })
 
-blogRouter.post('/api/blogs/', async (request, response) => {
+
+blogRouter.post('/', async (request, response) => {
   try {
     const body = request.body
-    const user = await User.findById(body.userId)
-    console.log(user)
+    const user = request.user
 
     const blog = new Blog({
       title: body.title,
       author: body.author,
       url: body.url,
       likes: body.likes === undefined ? 0 : body.likes,
-      user: user._id
+      user: user.id
     })
 
     if (blog.title===undefined || blog.url===undefined) {
@@ -32,7 +33,7 @@ blogRouter.post('/api/blogs/', async (request, response) => {
       user.blogs = user.blogs.concat(savedBlog._id)
       await user.save()
 
-      response.json(savedBlog)
+      response.status(201).json(savedBlog)
     }
   } catch(err) {
     console.error(err)
@@ -41,7 +42,7 @@ blogRouter.post('/api/blogs/', async (request, response) => {
   }
 })
 
-blogRouter.put('/api/blogs/:id', async (request, response) => {
+blogRouter.put('/:id', async (request, response) => {
   const blogId = request.params.id
   const existingBlog = await Blog.findById(blogId)
   console.log('existing blog::',existingBlog)
@@ -60,12 +61,14 @@ blogRouter.put('/api/blogs/:id', async (request, response) => {
   }
 })
 
-blogRouter.delete('/api/blogs/:id', (request, response) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then(() => {
-      response.status(204).end()
-    })
-    .catch(err => console.error(err))
+blogRouter.delete('/:id', async (request, response) => {
+  const user = request.user
+  if (user.blogs.some(blog => blog._id.toString() === request.params.id)) {
+    const removedBlog = await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
+  } else {
+    response.status(404).json({ error: 'Blog not found' })
+  }
 })
 
 module.exports = blogRouter

@@ -1,9 +1,9 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYjMiLCJpZCI6IjY1YTRmYmVmNWEwMzNlYzM3YWVhZDM4NCIsImlhdCI6MTcwNTQyMjg3OX0.dDqwfm9cTKtj1cXsUUA7sGUrtPme-GaAZ-1vXe9z8Tc
 
 {
-  "title": "Blog2",
-  "author": "Me",
-  "url": "https://somebloga.fi",
-  "userId": "65a2917564096343abafba96"
+  "title": "Blogg",
+  "author": "Me3",
+  "url": "https://someblogaaa.fi"
 }
